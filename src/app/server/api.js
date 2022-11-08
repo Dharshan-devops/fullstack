@@ -103,12 +103,11 @@ else{
 })
 
 router.post('/getdata',(req,res)=>{
-   let data=req.body
-   let obj={drawingnumber:data.drawingnumber,partname:data.partname,sequencename:data.sequencename}
-   d.collection("new").findOne(obj,(err,dat)=>{
-    if (err) throw err
-    res.send(JSON.stringify(dat))
-   })
+    let data=req.body
+    d.collection("new").find({drawingnumber:data.drawingnumber}).toArray((err,dat)=>{
+        res.send(JSON.stringify(dat)).status(200)
+    })
+
 
 })
 
