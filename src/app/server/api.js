@@ -7,6 +7,7 @@ app.use(bodyparser.json({limit: '50mb'}))
 app.use(bodyparser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }))
 const url="mongodb://127.0.0.1:27017/"
 var d
+var c
 mongo.connect(url,(err,db)=>{
     if(err) throw err;
     console.log("Database created")
@@ -56,10 +57,14 @@ router.post('/login',(req,res)=>{
 
 router.post('/file',(req,res)=>{
     let data=req.body
-    d.collection("new").createIndex({"sno":1},{unique:true})   
-    if(req.body){
+    mongo.connect(url,(err,database)=>{
+        var x=database.db("mydb")
+        c=x.collection("new").countDocuments()
+    })
+    if(c==null){
+    d.collection("new").createIndex({"sno":1},{unique:true})  
 
-    for(let i=0;i<data.length;i++){
+    for(let i=0;i<data.length;i++){ 
         const dat={
             sno:data[i]['sno'],
             drawingnumber:data[i]['drawingnumber'],
@@ -83,15 +88,16 @@ router.post('/file',(req,res)=>{
             
         }
 
-        d.collection("new").aggregate([dat],{upsert:true})
+        d.collection("new").insertMany([dat],{upsert:true})
     }
-    res.send(JSON.stringify("Data loaded"))
+    res.send(JSON.stringify("data loaded"))
+    
 }
 
-    else{
-        res.send(JSON.stringify("OOPS there is some error"))
+else{
+            res.send(JSON.stringify("Data exist"))
 
-    }
+}
 
     
 })
